@@ -49,4 +49,53 @@ def get_my_address():
         return jsonify(addresses_schema.dump(addresses)), 200
     except Exception as e:
         return jsonify({"status": "error", "message": "Failed to get address", "errors": str(e)}), 500
+    
+    
+@addresses_bp.route('/my_address/<int:id>', methods=['PUT'])
+@token_required
+def update_my_address(id):
+    try:
+        address_data = address_schema.load(request.json)
+        auth0_id = request.jwt_payload['sub']
+        query = select(User).where(User.auth0_id == auth0_id)
+        user = db.session.execute(query).scalars().first()
+        if not user:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+        
+        query = select(Address).where(Address.user_id == user.id, Address.id == id)
+        address = db.session.execute(query).scalars().first()
+        
+        if address == None:
+            return jsonify({"status":"error","message":"Invalid addresses"}), 404
+        
+        for field, value in address_data.items():
+            setattr(address, field, value)
+        return jsonify(address_schema.dump(address)), 200
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": "Failed to get address", "errors": str(e)}), 500
 
+    
+@addresses_bp.route('/my_address/<int:id>', methods=['DELETE'])
+@token_required
+def deelte_my_address(id):
+    try:
+        auth0_id = request.jwt_payload['sub']
+        query = select(User).where(User.auth0_id == auth0_id)
+        user = db.session.execute(query).scalars().first()
+        
+        if not user:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+        
+        address = db.session.get(Address,id)
+        
+        if address == None:
+            return jsonify({"status":"error","message":"Invalid addresses"}), 404
+        
+        db.session.delete(address)
+        db.session.commit()
+        
+        return jsonify({"status": "success","message": "Successfully deleted address"}), 200
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": "Failed to get address", "errors": str(e)}), 500
