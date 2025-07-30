@@ -3,7 +3,7 @@ from app.models import db
 from flask_cors import CORS
 
 app = create_app('DevelopmentConfig')
-CORS(app, origins=["http://localhost:5173"])
+CORS(app)
 with app.app_context():
     # db.drop_all()
     

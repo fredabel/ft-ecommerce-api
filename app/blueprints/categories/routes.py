@@ -10,7 +10,7 @@ from app.extensions import cache, limiter
 # This route allows the creation of a new category.
 # Rate limited to 10 requests per hour to prevent spamming.
 @categories_bp.route("/",methods=['POST'])
-@limiter.limit("10/hour")
+# @limiter.limit("10/hour")
 def create_category():
     try:
         category_data = category_schema.load(request.json)
