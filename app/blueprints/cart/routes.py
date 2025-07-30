@@ -5,18 +5,15 @@ from marshmallow import ValidationError
 from app.models import Cart, User, db
 from sqlalchemy import select, delete
 from app.extensions import cache, limiter
-from app.utils.util import encode_token, token_required
+from app.utils.util import token_required
 import stripe
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-# -------------------- Create a Cart --------------------
-# This route allows the creation of a new cart.
-# Rate limited to 10 requests per hour to prevent spamming.
+
 @cart_bp.route("/",methods=['POST'])
-# @limiter.limit("10/hour")
 @token_required
 def create_cart():
     try:
@@ -38,11 +35,7 @@ def create_cart():
     }), 201
 
 @cart_bp.route("/", methods=['GET'])
-# @token_required
 def get_cart():
-    """
-    Retrieve all carts.
-    """
     stmt = select(Cart)
     result = db.session.execute(stmt)
     cart = result.scalars().first()
@@ -63,17 +56,6 @@ def get_my_cart():
     cart = db.session.execute(stmt).scalars().first()
     return jsonify(cart_schema.dump(cart)), 200
 
-#Cart History
-@cart_bp.route("/history", methods=['GET'])
-@token_required
-def get_my_cart_history():
-    auth0_id = request.jwt_payload['sub']
-    query = select(User).where(User.auth0_id == auth0_id)
-    user = db.session.execute(query).scalars().first()
-    stmt = select(Cart).where(Cart.user_id == user.id, Cart.payment_status != "unpaid")
-    result = db.session.execute(stmt)
-    carts = result.scalars().all()
-    return jsonify(carts_schema.dump(carts)), 200
 
 @cart_bp.route("/update_cart/<int:id>", methods=['PUT'])
 @token_required
@@ -98,7 +80,23 @@ def update_my_cart(id):
     
     except ValidationError as err:
         return jsonify(err.messages), 400
+
+@cart_bp.route("/<int:id>", methods=['DELETE'])
+@token_required
+def delete_cart(id):
+    auth0_id = request.jwt_payload['sub']
+    query = select(User).where(User.auth0_id == auth0_id)
+    user = db.session.execute(query).scalars().first()
+    if not user:
+        return jsonify({"status": "error","message":"User not found"}), 404
     
+    cart = db.session.get(Cart, id)
+    if not cart:
+        return jsonify({"status": "error","message":"Cart not found"}), 404
+    db.session.delete(cart)
+    db.session.commit()   
+    return jsonify({"status": "success","message":"Successfully deleted!"}), 200
+
 # Payment Method
 @cart_bp.route("/create-payment-intent", methods=["POST"])
 @token_required
