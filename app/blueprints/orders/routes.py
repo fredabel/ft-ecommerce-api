@@ -6,7 +6,7 @@ from app.models import Order, OrderItem, Cart, CartItem, Discount, User, db
 from sqlalchemy import select, delete
 from app.extensions import limiter
 from app.extensions import cache
-from app.utils.util import encode_token, token_required
+from app.utils.util import  token_required
 import random, string, time
 
 
@@ -181,9 +181,9 @@ def update_my_order():
             return jsonify({"status": "error", "message": "User not found"}), 404
         
         order_id = request.json.get('order_id')
+        print(order_id)
         
-        
-        stmt = select(Order).where(Order.id == order_id)
+        stmt = select(Order).where(Order.id == order_id, Order.order_status == 'pending')
         order = db.session.execute(stmt).scalars().first()
         if not order:
             return jsonify({"status": "error", "message": "Order not found"}), 404
