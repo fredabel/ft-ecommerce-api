@@ -12,7 +12,6 @@ from app.utils.util import token_required
 # Rate limited to 10 requests per hour to prevent spamming.
 @cart_item_bp.route("/",methods=['POST'])
 @token_required
-# @limiter.limit("10/hour")
 def create_cart_item():
     try:
         auth0_id = request.jwt_payload['sub']
