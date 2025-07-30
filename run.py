@@ -11,7 +11,8 @@ CORS(
         "http://localhost:5173"
     ]}},
     supports_credentials=True,
-    allow_headers=["Content-Type", "Authorization"]
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 )
 @app.route('/', methods=['GET'])
 def index():
