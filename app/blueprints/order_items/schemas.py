@@ -3,7 +3,7 @@ from app.extensions import ma
 from marshmallow import fields
 class OrderItemSchema(ma.SQLAlchemyAutoSchema):
     order = fields.Nested('OrderSchema',only=['id', 'subtotal_amount', 'tax_amount', 'shipping_amount', 'total_amount'])
-    product = fields.Nested("ProductSchema", only=['id', 'name', 'description', 'price'])
+    product = fields.Nested("ProductSchema")
     variant = fields.Nested("ProductVariantSchema")
     class Meta:
         model = OrderItem

@@ -59,7 +59,7 @@ def get_my_cart():
     if not user:
         return jsonify({"status": "error", "message": "User not found"}), 404
 
-    stmt = select(Cart).where(Cart.user_id == user.id, Cart.payment_status == "unpaid")
+    stmt = select(Cart).where(Cart.user_id == user.id)
     cart = db.session.execute(stmt).scalars().first()
     return jsonify(cart_schema.dump(cart)), 200
 

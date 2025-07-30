@@ -53,16 +53,16 @@ def create_cart_item():
         return jsonify(err.messages), 400
 
    
-    
 @cart_item_bp.route("/", methods=['GET'])
+@token_required
 def get_cart_items():
-    """
-    Retrieve all cart items.
-    """
-    stmt = select(CartItem)
-    result = db.session.execute(stmt)
-    cart_items = result.scalars().all()
-    return jsonify(cart_items_schema.dump(cart_items)), 200
+    try:
+        cart_id = request.args.get('cart_id', type=int)
+        stmt = select(CartItem).where(CartItem.cart_id == cart_id)
+        cart_items = db.session.execute(stmt).scalars().all()
+        return jsonify(cart_items_schema.dump(cart_items)), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @cart_item_bp.route("/<int:id>", methods=['PUT'])
 @token_required
@@ -112,7 +112,7 @@ def delete_cart_item(id):
             return jsonify({"status": "error", "message": "User not found"}), 404
         
         # Find the customer's cart
-        stmt = select(Cart).where(Cart.user_id == user.id, Cart.payment_status == "unpaid")
+        stmt = select(Cart).where(Cart.user_id == user.id)
         cart = db.session.execute(stmt).scalars().first()
         
         # Find the cart item by id and make sure it belongs to this cart

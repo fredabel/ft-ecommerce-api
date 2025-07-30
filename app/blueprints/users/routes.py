@@ -6,7 +6,7 @@ from app.models import User, db
 from sqlalchemy import select, delete
 from app.extensions import limiter
 from app.extensions import cache
-from app.utils.util import encode_token, token_required
+from app.utils.util import  token_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 @users_bp.route("/sync", methods=['POST'])
@@ -87,16 +87,21 @@ def update_user():
     user = db.session.execute(query).scalars().first()
     if user == None:
         return jsonify({"status":"error","message":"Invalid user"}), 404
+    
     try:
         user_data = user_schema.load(request.json)
         if request.args.get('password'):
             user_data['password'] = generate_password_hash(user_data['password'])
     except ValidationError as err:
         return jsonify(err.messages), 400
+    
     if user_data['email'] != user.email:
         email_exist = db.session.execute(select(User).where(User.email == user_data['email'])).scalar_one_or_none()
         if email_exist:
             return jsonify({"status":"error", "message": "A user with this email already exists"}), 400
+    
+    user_data['full_name'] = f"{user_data['first_name']} {user_data['last_name']}".title()    
+    
     for field, value in user_data.items():
         setattr(user, field, value)
     db.session.commit()

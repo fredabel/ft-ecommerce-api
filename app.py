@@ -10,7 +10,7 @@ with app.app_context():
     # tables_to_drop = [table for table in db.metadata.sorted_tables if table.name != 'users']
     # for table in tables_to_drop:
     #     table.drop(db.engine)
-    # db.metadata.tables['discounts'].drop(db.engine)
+    # db.metadata.tables['payments'].drop(db.engine)
     db.create_all()
 
 app.run()

@@ -2,7 +2,7 @@ from flask import request, jsonify
 from app.blueprints.addresses import addresses_bp
 from app.blueprints.addresses.schemas import address_schema, addresses_schema
 from marshmallow import ValidationError
-from app.models import Address, db
+from app.models import Address, User, db
 from sqlalchemy import select, delete
 from app.extensions import limiter
 from app.extensions import cache
@@ -31,3 +31,22 @@ def create_address():
         return jsonify({"status": "error", "message": "Invalid address data", "errors": e.messages}), 400
     except Exception as e:
         return jsonify({"status": "error", "message": "Failed to create address", "errors": str(e)}), 500
+
+@addresses_bp.route('/my_address', methods=['GET'])
+@token_required
+def get_my_address():
+    try:
+        auth0_id = request.jwt_payload['sub']
+        query = select(User).where(User.auth0_id == auth0_id)
+        user = db.session.execute(query).scalars().first()
+        if not user:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+        query = select(Address).where(Address.user_id == user.id)
+        addresses = db.session.execute(query).scalars().all()
+        if addresses == None:
+            return jsonify({"status":"error","message":"Invalid addresses"}), 404
+        
+        return jsonify(addresses_schema.dump(addresses)), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": "Failed to get address", "errors": str(e)}), 500
+

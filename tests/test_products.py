@@ -52,52 +52,46 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json['message'], "Invalid product")
 
-    # def test_update_products(self): 
+    def test_update_products(self): 
         
-    #     payLoad = self.payLoad.copy()
-    #     payLoad["name"] = "Updated Name"
-    #     response = self.client.put('products/1', json=payLoad)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.json['message'], "Successfully updated product")
-    #     self.assertEqual(response.json['product']['name'], payLoad["name"])
+        payLoad = self.payLoad.copy()
+        payLoad["name"] = "Updated Name"
+        response = self.client.put('products/1', json=payLoad)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json['message'], "Successfully updated product")
+        self.assertEqual(response.json['product']['name'], payLoad["name"])
         
-    # def test_update_invalid_products(self): 
+    def test_update_invalid_products(self): 
         
-    #     payLoad = self.payLoad.copy()
-    #     payLoad["name"] = "Updated Name"
-    #     response = self.client.put('products/999', json=payLoad)
-    #     self.assertEqual(response.status_code, 404)
-    #     self.assertEqual(response.json['message'], "Product not found")
+        payLoad = self.payLoad.copy()
+        payLoad["name"] = "Updated Name"
+        response = self.client.put('products/999', json=payLoad)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json['message'], "Product not found")
         
-    # def test_delete__products(self): 
+    def test_delete__products(self): 
         
-    #     response = self.client.delete('products/1')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.json['message'], "Successfully deleted product")
+        response = self.client.delete('products/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json['message'], "Successfully deleted product")
     
-    # def test_delete_invalid_products(self): 
+    def test_delete_invalid_products(self): 
         
-    #     response = self.client.delete('products/999')
-    #     self.assertEqual(response.status_code, 404)
-    #     self.assertEqual(response.json['message'], "Product not found")
+        response = self.client.delete('products/999')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json['message'], "Product not found")
     
-    # def test_search_product_by_name(self): 
+    def test_search_product_by_name(self): 
         
-    #     response = self.client.get('/products/search', query_string={"name": self.payLoad['name']})
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIsInstance(response.json, list)
-        
-    # def test_search_product_by_brand(self): 
-        
-    #     response = self.client.get('/products/search', query_string={"brand": self.payLoad['brand']})
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIsInstance(response.json, list)
-
-    # def test_search_product_no_params(self): 
+        response = self.client.get('/products/search', query_string={"name": self.payLoad['name']})
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.json, list)
     
-    #     response = self.client.get('/products/search')
-    #     self.assertEqual(response.status_code, 400)
-    #     self.assertEqual(response.json['message'], "Please provide a name or brand to search")
+    def test_search_product_no_params(self): 
+    
+        response = self.client.get('/products/search')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['message'], "Please provide a name or brand to search")
    
     
     

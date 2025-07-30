@@ -90,10 +90,6 @@ def delete_product(product_id):
     if not product:
         return jsonify({"status": "error","message":"Product not found"}), 404
     
-    # Check for related serialized parts
-    if product.serial_products:
-        return jsonify({"status": "error", "message": "Cannot delete: related serialized product exist."}), 400
-    
     db.session.delete(product)
     db.session.commit()
     return jsonify({"status": "success","message": "Successfully deleted product"}), 200

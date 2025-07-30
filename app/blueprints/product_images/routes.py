@@ -28,3 +28,23 @@ def create_product_image():
     except Exception as e:
         db.session.rollback()
         return jsonify({"status": "error", "message": "Failed to create product image", "errors": str(e)}), 500
+
+@product_images_bp.route('/<int:id>', methods=['PUT'])
+def update_product_image(id):
+    try:
+        payload = product_image_schema.load(request.json)
+        data = db.session.get(ProductImage, id)
+        if not data:
+            return jsonify({"status": "error","message":"Product not found"}), 404
+        
+        for field, value in payload.items():
+            setattr(data, field, value)
+        
+        db.session.commit()
+        return jsonify({"status": "success","message":"Successfully updated product image","image": product_image_schema.dump(data)}), 200
+    except ValidationError as err:
+        return jsonify(err.messages), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": "Failed to create product image", "errors": str(e)}), 500
+    

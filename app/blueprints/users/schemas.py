@@ -3,6 +3,7 @@ from app.extensions import ma
 from marshmallow import fields
 class UserSchema(ma.SQLAlchemyAutoSchema):
     password = fields.String(load_only=True, required=False)
+    full_name = fields.String(required=False)
     class Meta:
         model = User
             
