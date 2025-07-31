@@ -7,7 +7,7 @@ app = create_app('ProductionConfig')
 CORS(
     app,
     resources={r"/*": {"origins": [
-        "https://ct-service-ticket-client-production.up.railway.app",
+        "https://ft-store.up.railway.app",
         "http://localhost:5173"
     ]}},
     supports_credentials=True,
