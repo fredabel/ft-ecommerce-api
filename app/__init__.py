@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_migrate import Migrate
 from app.models import db
 from app.extensions import ma, limiter, cache
 from app.blueprints.users import users_bp
@@ -40,6 +41,8 @@ def create_app(config_name):
     ma.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
+    Migrate(app, db)
+    
 
     app.register_blueprint(users_bp, url_prefix='/users')
     app.register_blueprint(addresses_bp, url_prefix='/addresses')

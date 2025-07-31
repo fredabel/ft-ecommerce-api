@@ -208,7 +208,7 @@ class Payment(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     order_id: Mapped[int] = mapped_column(db.ForeignKey("orders.id"), nullable=False)
     payment_intent_id: Mapped[int] = mapped_column(db.String(255), nullable=False)
-    payment_method: Mapped[str] = mapped_column(db.String(20), nullable=False)
+    payment_method: Mapped[str] = mapped_column(db.String(200), nullable=False)
     transaction_id: Mapped[str] = mapped_column(db.String(255), nullable=False, unique=True)
     amount: Mapped[float] = mapped_column(db.Numeric(10, 2), nullable=False)
     currency: Mapped[str] = mapped_column(db.String(10), nullable=False)
